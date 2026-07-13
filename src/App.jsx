@@ -612,6 +612,30 @@ function ReceiptTab({ data, refresh }) {
         </div>
       </Card>
 
+
+      <Card>
+        <div style={{ fontWeight: 700, marginBottom: 8, color: C.forest }}>記録一覧({data.receiptLogs.length}件)</div>
+        <LeafDivider />
+        {data.receiptLogs.length === 0 ? <div style={{ color: C.gray, fontSize: 13 }}>まだ記録がありません。</div> : (
+          <table style={{ width: "100%", fontSize: 13, borderCollapse: "collapse" }}>
+            <thead><tr style={{ color: C.gray, textAlign: "left" }}><th style={{ padding: 6 }}>日付</th><th style={{ padding: 6 }}>売上高</th><th style={{ padding: 6 }}>客数</th><th style={{ padding: 6 }}>客単価</th><th></th></tr></thead>
+            <tbody>
+              {[...data.receiptLogs].reverse().map((l) => (
+                <tr key={l.id} style={{ borderTop: `1px solid ${C.mossL}` }}>
+                  <td style={{ padding: 6 }}>{l.date}</td>
+                  <td style={{ padding: 6 }}>{fmtYen(l.salesTotal)}</td>
+                  <td style={{ padding: 6 }}>{l.customerCount}人</td>
+                  <td style={{ padding: 6, fontWeight: 600 }}>{fmtYen(l.avgSpend)}</td>
+                  <td style={{ padding: 6, textAlign: "right" }}><button style={btnGhost} onClick={() => remove(l.id)}><Trash size={13} /></button></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </Card>
+    </div>
+  );
+}
 // ==================== ダッシュボード ====================
 function DashboardTab({ data }) {
   const [periodId, setPeriodId] = useState(data.periods[data.periods.length - 1]?.id || "");
