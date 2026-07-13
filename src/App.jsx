@@ -10,10 +10,12 @@ import {
 import { supabase } from "./supabaseClient";
 
 const C = {
-  forest: "#1F4A34", leaf: "#3D7A5B", sage: "#A8C9AE", mossL: "#E4EEE3",
-  ivory: "#F8F4E9", wood: "#8B6B4A", ink: "#24301F", gray: "#5F6B5A",
-  white: "#FFFFFF", danger: "#B5533C",
+  forest: "#1B3E30", leaf: "#3D7A5B", sage: "#A8C9AE", mossL: "#E7EEE4",
+  ivory: "#F7F3EC", wood: "#9C7A4F", ink: "#242320", gray: "#66625A",
+  white: "#FFFFFF", danger: "#B0503A",
 };
+const FONT_DISPLAY = "'Shippori Mincho', serif";
+const FONT_BODY = "'Zen Kaku Gothic New', 'Hiragino Sans', sans-serif";
 
 const fmtYen = (n) => "¥" + Math.round(n || 0).toLocaleString("ja-JP");
 const fmtNum = (n) => (Math.round((n || 0) * 100) / 100).toLocaleString("ja-JP");
@@ -30,7 +32,7 @@ function LeafDivider() {
   );
 }
 function Card({ children, style }) {
-  return <div style={{ background: C.white, border: `1px solid ${C.sage}55`, borderRadius: 16, padding: 18, boxShadow: "0 2px 10px rgba(31,74,52,0.06)", ...style }}>{children}</div>;
+  return <div style={{ background: C.white, border: `1px solid ${C.sage}44`, borderRadius: 18, padding: "22px 24px", boxShadow: "0 4px 20px rgba(27,62,48,0.07)", ...style }}>{children}</div>;
 }
 function Field({ label, children }) {
   return (
@@ -39,9 +41,9 @@ function Field({ label, children }) {
     </label>
   );
 }
-const inputStyle = { border: `1px solid ${C.sage}`, borderRadius: 10, padding: "8px 10px", fontSize: 14, color: C.ink, background: C.ivory, outline: "none" };
-const btnPrimary = { background: C.forest, color: C.white, border: "none", borderRadius: 10, padding: "9px 16px", fontSize: 14, fontWeight: 600, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6 };
-const btnGhost = { background: "transparent", color: C.danger, border: `1px solid ${C.danger}55`, borderRadius: 8, padding: "6px 10px", fontSize: 13, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 4 };
+const inputStyle = { border: `1px solid ${C.sage}99`, borderRadius: 8, padding: "9px 12px", fontSize: 14, color: C.ink, background: C.ivory, outline: "none", fontFamily: FONT_BODY };
+const btnPrimary = { background: C.forest, color: C.white, border: "none", borderRadius: 999, padding: "10px 20px", fontSize: 13, fontWeight: 500, letterSpacing: 0.5, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6, boxShadow: "0 3px 10px rgba(27,62,48,0.2)" };
+const btnGhost = { background: "transparent", color: C.danger, border: `1px solid ${C.danger}44`, borderRadius: 999, padding: "6px 12px", fontSize: 12, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 4 };
 
 function Badge({ children, tone = "sage" }) {
   const map = { sage: { bg: C.mossL, fg: C.forest }, danger: { bg: "#F6E4DF", fg: C.danger }, warn: { bg: "#FBF1D6", fg: "#8A6A1E" } };
@@ -88,7 +90,7 @@ async function loadAllData() {
 }
 
 export default function App() {
-  const [tab, setTab] = useState("ingredients");
+  const [tab, setTab] = useState("dashboard");
   const [data, setData] = useState({ ingredients: [], menuItems: [], periods: [], wasteLogs: [], receiptLogs: [] });
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
@@ -109,35 +111,37 @@ export default function App() {
   useEffect(() => { refresh(); }, []);
 
   const TABS = [
+    { id: "dashboard", label: "ダッシュボード", icon: BarChart3 },
     { id: "ingredients", label: "食材マスタ", icon: Package },
     { id: "menu", label: "レシピ原価", icon: ChefHat },
     { id: "period", label: "棚卸入力", icon: ClipboardList },
     { id: "waste", label: "廃棄記録", icon: Trash2 },
     { id: "receipt", label: "レジ締め記録", icon: Receipt },
-    { id: "dashboard", label: "ダッシュボード", icon: BarChart3 },
   ];
 
   return (
-    <div style={{ fontFamily: "'Yu Gothic','Hiragino Sans',sans-serif", background: C.ivory, color: C.ink, minHeight: "100vh" }}>
-      <div style={{ background: C.forest, color: C.white, padding: "18px 24px", display: "flex", alignItems: "center", gap: 10 }}>
-        <Leaf size={22} style={{ color: C.sage }} />
+    <div style={{ fontFamily: FONT_BODY, background: C.ivory, color: C.ink, minHeight: "100vh" }}>
+      <div style={{ background: C.forest, color: C.white, padding: "26px 28px 22px", display: "flex", alignItems: "center", gap: 14, borderBottom: `3px solid ${C.wood}` }}>
+        <Leaf size={20} style={{ color: C.sage }} />
         <div>
-          <div style={{ fontSize: 18, fontWeight: 700, letterSpacing: 1 }}>PLATEAU</div>
-          <div style={{ fontSize: 12, color: C.sage }}>棚卸・原価・ロス・客単価をひとつに</div>
+          <div style={{ fontFamily: FONT_DISPLAY, fontSize: 26, fontWeight: 700, letterSpacing: 3 }}>PLATEAU</div>
+          <div style={{ fontSize: 11, color: C.sage, letterSpacing: 1.5, marginTop: 2, textTransform: "uppercase" }}>棚卸・原価・ロス・客単価をひとつに</div>
         </div>
       </div>
 
-      <div style={{ display: "flex", gap: 4, padding: "10px 16px", background: C.mossL, flexWrap: "wrap" }}>
+      <div style={{ display: "flex", gap: 6, padding: "14px 20px", background: C.mossL, flexWrap: "wrap", borderBottom: `1px solid ${C.sage}66` }}>
         {TABS.map((t) => {
           const Icon = t.icon;
           const active = tab === t.id;
           return (
             <button key={t.id} onClick={() => setTab(t.id)} style={{
-              display: "flex", alignItems: "center", gap: 6, padding: "8px 14px", borderRadius: 10,
-              border: "none", cursor: "pointer", fontSize: 13, fontWeight: 600,
+              display: "flex", alignItems: "center", gap: 7, padding: "9px 16px", borderRadius: 999,
+              border: active ? "none" : `1px solid ${C.sage}88`, cursor: "pointer", fontSize: 13, fontWeight: 500,
               background: active ? C.forest : "transparent", color: active ? C.white : C.gray,
+              boxShadow: active ? "0 3px 8px rgba(27,62,48,0.25)" : "none",
+              transition: "all 0.15s ease",
             }}>
-              <Icon size={15} />{t.label}
+              <Icon size={14} />{t.label}
             </button>
           );
         })}
@@ -176,7 +180,7 @@ function IngredientsTab({ data, refresh }) {
   return (
     <div>
       <Card style={{ marginBottom: 18 }}>
-        <div style={{ fontWeight: 700, marginBottom: 8, color: C.forest }}>食材を追加</div>
+        <div style={{ fontWeight: 700, marginBottom: 12, color: C.forest, fontFamily: FONT_DISPLAY, fontSize: 17, letterSpacing: 0.5 }}>食材を追加</div>
         <LeafDivider />
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "flex-end" }}>
           <Field label="品目名"><input style={{ ...inputStyle, width: 180 }} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="例: 豚バラ肉" /></Field>
@@ -191,7 +195,7 @@ function IngredientsTab({ data, refresh }) {
       </Card>
 
       <Card>
-        <div style={{ fontWeight: 700, marginBottom: 8, color: C.forest }}>食材一覧({data.ingredients.length}件)</div>
+        <div style={{ fontWeight: 700, marginBottom: 12, color: C.forest, fontFamily: FONT_DISPLAY, fontSize: 17, letterSpacing: 0.5 }}>食材一覧({data.ingredients.length}件)</div>
         <LeafDivider />
         {data.ingredients.length === 0 ? <div style={{ color: C.gray, fontSize: 13 }}>まだ食材が登録されていません。</div> : (
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
@@ -242,7 +246,7 @@ function MenuTab({ data, refresh }) {
   return (
     <div>
       <Card style={{ marginBottom: 18 }}>
-        <div style={{ fontWeight: 700, marginBottom: 8, color: C.forest }}>メニューを追加</div>
+        <div style={{ fontWeight: 700, marginBottom: 12, color: C.forest, fontFamily: FONT_DISPLAY, fontSize: 17, letterSpacing: 0.5 }}>メニューを追加</div>
         <LeafDivider />
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "flex-end" }}>
           <Field label="メニュー名"><input style={{ ...inputStyle, width: 200 }} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="例: 生姜焼き定食" /></Field>
@@ -253,7 +257,7 @@ function MenuTab({ data, refresh }) {
 
       <div style={{ display: "flex", gap: 18, flexWrap: "wrap" }}>
         <Card style={{ flex: "1 1 320px" }}>
-          <div style={{ fontWeight: 700, marginBottom: 8, color: C.forest }}>メニュー一覧</div>
+          <div style={{ fontWeight: 700, marginBottom: 12, color: C.forest, fontFamily: FONT_DISPLAY, fontSize: 17, letterSpacing: 0.5 }}>メニュー一覧</div>
           <LeafDivider />
           {data.menuItems.length === 0 && <div style={{ color: C.gray, fontSize: 13 }}>メニューが登録されていません。</div>}
           {data.menuItems.map((m) => {
@@ -280,7 +284,7 @@ function MenuTab({ data, refresh }) {
         </Card>
 
         <Card style={{ flex: "1 1 320px" }}>
-          <div style={{ fontWeight: 700, marginBottom: 8, color: C.forest }}>{current ? `${current.name} のレシピ` : "メニューを選択してください"}</div>
+          <div style={{ fontWeight: 700, marginBottom: 12, color: C.forest, fontFamily: FONT_DISPLAY, fontSize: 17, letterSpacing: 0.5 }}>{current ? `${current.name} のレシピ` : "メニューを選択してください"}</div>
           <LeafDivider />
           {current && (
             <>
@@ -399,12 +403,12 @@ function PeriodTab({ data, refresh }) {
       {period && (
         <>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-            <div style={{ fontWeight: 700, fontSize: 16, color: C.forest }}>{period.name}</div>
+            <div style={{ fontWeight: 700, fontSize: 19, color: C.forest, fontFamily: FONT_DISPLAY, letterSpacing: 0.5 }}>{period.name}</div>
             {period.closed ? <Badge tone="sage"><CheckCircle2 size={12} style={{ verticalAlign: -2 }} /> 確定済み</Badge> : <Badge tone="warn">進行中</Badge>}
           </div>
 
           <Card style={{ marginBottom: 16 }}>
-            <div style={{ fontWeight: 700, marginBottom: 8, color: C.forest }}>売上数量(メニュー別・期間合計)</div>
+            <div style={{ fontWeight: 700, marginBottom: 12, color: C.forest, fontFamily: FONT_DISPLAY, fontSize: 17, letterSpacing: 0.5 }}>売上数量(メニュー別・期間合計)</div>
             <LeafDivider />
             {data.menuItems.length === 0 ? <div style={{ color: C.gray, fontSize: 13 }}>メニューが未登録です。先にレシピ原価タブで登録してください。</div> : (
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px,1fr))", gap: 10 }}>
@@ -418,7 +422,7 @@ function PeriodTab({ data, refresh }) {
           </Card>
 
           <Card style={{ marginBottom: 16 }}>
-            <div style={{ fontWeight: 700, marginBottom: 8, color: C.forest }}>食材別 仕入数量・実棚卸数量</div>
+            <div style={{ fontWeight: 700, marginBottom: 12, color: C.forest, fontFamily: FONT_DISPLAY, fontSize: 17, letterSpacing: 0.5 }}>食材別 仕入数量・実棚卸数量</div>
             <LeafDivider />
             {data.ingredients.length === 0 ? <div style={{ color: C.gray, fontSize: 13 }}>食材が未登録です。先に食材マスタタブで登録してください。</div> : (
               <table style={{ width: "100%", fontSize: 13, borderCollapse: "collapse" }}>
@@ -486,7 +490,7 @@ function WasteTab({ data, refresh }) {
   return (
     <div>
       <Card style={{ marginBottom: 18 }}>
-        <div style={{ fontWeight: 700, marginBottom: 8, color: C.forest }}>廃棄を記録</div>
+        <div style={{ fontWeight: 700, marginBottom: 12, color: C.forest, fontFamily: FONT_DISPLAY, fontSize: 17, letterSpacing: 0.5 }}>廃棄を記録</div>
         <LeafDivider />
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "flex-end" }}>
           <Field label="対象期間">
@@ -513,7 +517,7 @@ function WasteTab({ data, refresh }) {
       </Card>
 
       <Card>
-        <div style={{ fontWeight: 700, marginBottom: 8, color: C.forest }}>廃棄ログ({data.wasteLogs.length}件)</div>
+        <div style={{ fontWeight: 700, marginBottom: 12, color: C.forest, fontFamily: FONT_DISPLAY, fontSize: 17, letterSpacing: 0.5 }}>廃棄ログ({data.wasteLogs.length}件)</div>
         <LeafDivider />
         {data.wasteLogs.length === 0 ? <div style={{ color: C.gray, fontSize: 13 }}>記録がありません。</div> : (
           <table style={{ width: "100%", fontSize: 13, borderCollapse: "collapse" }}>
@@ -591,7 +595,7 @@ function ReceiptTab({ data, refresh }) {
   return (
     <div>
       <Card style={{ marginBottom: 18 }}>
-        <div style={{ fontWeight: 700, marginBottom: 10, color: C.forest, display: "flex", alignItems: "center", gap: 6 }}>
+        <div style={{ fontWeight: 700, marginBottom: 10, color: C.forest, display: "flex", alignItems: "center", gap: 6, fontFamily: FONT_DISPLAY, fontSize: 17, letterSpacing: 0.5 }}>
           <Receipt size={16} /> レジ締め結果を記録
         </div>
         <LeafDivider />
@@ -612,9 +616,8 @@ function ReceiptTab({ data, refresh }) {
         </div>
       </Card>
 
-
       <Card>
-        <div style={{ fontWeight: 700, marginBottom: 8, color: C.forest }}>記録一覧({data.receiptLogs.length}件)</div>
+        <div style={{ fontWeight: 700, marginBottom: 12, color: C.forest, fontFamily: FONT_DISPLAY, fontSize: 17, letterSpacing: 0.5 }}>記録一覧({data.receiptLogs.length}件)</div>
         <LeafDivider />
         {data.receiptLogs.length === 0 ? <div style={{ color: C.gray, fontSize: 13 }}>まだ記録がありません。</div> : (
           <table style={{ width: "100%", fontSize: 13, borderCollapse: "collapse" }}>
@@ -636,6 +639,7 @@ function ReceiptTab({ data, refresh }) {
     </div>
   );
 }
+
 // ==================== ダッシュボード ====================
 function DashboardTab({ data }) {
   const [periodId, setPeriodId] = useState(data.periods[data.periods.length - 1]?.id || "");
@@ -696,9 +700,9 @@ function DashboardTab({ data }) {
   });
 
   const StatCard = ({ label, value, tone }) => (
-    <Card style={{ flex: "1 1 150px", textAlign: "center" }}>
-      <div style={{ fontSize: 12, color: C.gray, marginBottom: 6 }}>{label}</div>
-      <div style={{ fontSize: 22, fontWeight: 800, color: tone || C.forest }}>{value}</div>
+    <Card style={{ flex: "1 1 150px", textAlign: "center", padding: "18px 16px" }}>
+      <div style={{ fontSize: 11, color: C.gray, marginBottom: 8, letterSpacing: 1, textTransform: "uppercase" }}>{label}</div>
+      <div style={{ fontSize: 26, fontWeight: 700, color: tone || C.forest, fontFamily: FONT_DISPLAY }}>{value}</div>
     </Card>
   );
 
@@ -723,7 +727,7 @@ function DashboardTab({ data }) {
       </div>
 
       <Card style={{ marginBottom: 18 }}>
-        <div style={{ fontWeight: 700, marginBottom: 8, color: C.forest }}>客単価の推移(直近14件のレジ締め記録)</div>
+        <div style={{ fontWeight: 700, marginBottom: 12, color: C.forest, fontFamily: FONT_DISPLAY, fontSize: 17, letterSpacing: 0.5 }}>客単価の推移(直近14件のレジ締め記録)</div>
         <LeafDivider />
         {chartData.length === 0 ? <div style={{ color: C.gray, fontSize: 13 }}>レジ締め記録タブでデータを入れると表示されます。</div> : (
           <ResponsiveContainer width="100%" height={200}>
@@ -740,7 +744,7 @@ function DashboardTab({ data }) {
 
       <div style={{ display: "flex", gap: 18, flexWrap: "wrap", marginBottom: 18 }}>
         <Card style={{ flex: "1 1 400px" }}>
-          <div style={{ fontWeight: 700, marginBottom: 8, color: C.forest }}>食材別ロス金額(上位8件)</div>
+          <div style={{ fontWeight: 700, marginBottom: 12, color: C.forest, fontFamily: FONT_DISPLAY, fontSize: 17, letterSpacing: 0.5 }}>食材別ロス金額(上位8件)</div>
           <LeafDivider />
           {barData.length === 0 ? <div style={{ color: C.gray, fontSize: 13 }}>データがありません。</div> : (
             <ResponsiveContainer width="100%" height={260}>
@@ -758,7 +762,7 @@ function DashboardTab({ data }) {
         </Card>
 
         <Card style={{ flex: "1 1 300px" }}>
-          <div style={{ fontWeight: 700, marginBottom: 8, color: C.forest }}>廃棄理由別 金額内訳</div>
+          <div style={{ fontWeight: 700, marginBottom: 12, color: C.forest, fontFamily: FONT_DISPLAY, fontSize: 17, letterSpacing: 0.5 }}>廃棄理由別 金額内訳</div>
           <LeafDivider />
           {pieData.length === 0 ? <div style={{ color: C.gray, fontSize: 13 }}>廃棄記録がありません。</div> : (
             <ResponsiveContainer width="100%" height={260}>
@@ -775,7 +779,7 @@ function DashboardTab({ data }) {
       </div>
 
       <Card>
-        <div style={{ fontWeight: 700, marginBottom: 8, color: C.forest }}>メニュー別 原価率</div>
+        <div style={{ fontWeight: 700, marginBottom: 12, color: C.forest, fontFamily: FONT_DISPLAY, fontSize: 17, letterSpacing: 0.5 }}>メニュー別 原価率</div>
         <LeafDivider />
         {menuRows.length === 0 ? <div style={{ color: C.gray, fontSize: 13 }}>メニューが登録されていません。</div> : (
           <table style={{ width: "100%", fontSize: 13, borderCollapse: "collapse" }}>
