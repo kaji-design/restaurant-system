@@ -122,7 +122,7 @@ export default function App() {
       <div style={{ background: C.forest, color: C.white, padding: "18px 24px", display: "flex", alignItems: "center", gap: 10 }}>
         <Leaf size={22} style={{ color: C.sage }} />
         <div>
-          <div style={{ fontSize: 18, fontWeight: 700 }}>飲食店 統合経営システム</div>
+          <div style={{ fontSize: 18, fontWeight: 700, letterSpacing: 1 }}>PLATEAU</div>
           <div style={{ fontSize: 12, color: C.sage }}>棚卸・原価・ロス・客単価をひとつに</div>
         </div>
       </div>
@@ -541,7 +541,40 @@ function WasteTab({ data, refresh }) {
   );
 }
 
-// ==================== レジ締め記録(手入力) ====================
+// ==================== レジ締め記録(レシート風デザイン) ====================
+function ReceiptPreview({ date, salesTotal, customerCount, note }) {
+  const sales = parseFloat(salesTotal) || 0;
+  const count = parseFloat(customerCount) || 0;
+  const avg = count > 0 ? sales / count : 0;
+  const zigzag = "polygon(0% 0%,100% 0%,100% 100%,97% 94%,94% 100%,91% 94%,88% 100%,85% 94%,82% 100%,79% 94%,76% 100%,73% 94%,70% 100%,67% 94%,64% 100%,61% 94%,58% 100%,55% 94%,52% 100%,49% 94%,46% 100%,43% 94%,40% 100%,37% 94%,34% 100%,31% 94%,28% 100%,25% 94%,22% 100%,19% 94%,16% 100%,13% 94%,10% 100%,7% 94%,4% 100%,1% 94%,0% 100%)";
+  return (
+    <div style={{
+      background: C.white, width: 260, margin: "0 auto", padding: "22px 20px 34px",
+      fontFamily: "'Courier New', monospace", color: C.ink, fontSize: 13,
+      boxShadow: "0 6px 16px rgba(31,74,52,0.12)", clipPath: zigzag,
+    }}>
+      <div style={{ textAlign: "center", fontWeight: 700, letterSpacing: 2, marginBottom: 4 }}>
+        <Receipt size={16} style={{ verticalAlign: -3, marginRight: 4, color: C.leaf }} />
+        RECEIPT
+      </div>
+      <div style={{ textAlign: "center", color: C.gray, fontSize: 11, marginBottom: 12 }}>{date || todayStr()}</div>
+      <div style={{ borderTop: `1px dashed ${C.wood}`, margin: "8px 0" }} />
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+        <span>売上合計</span><span>{fmtYen(sales)}</span>
+      </div>
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+        <span>客数</span><span>{count || 0}人</span>
+      </div>
+      <div style={{ borderTop: `1px dashed ${C.wood}`, margin: "8px 0" }} />
+      <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 700 }}>
+        <span>客単価</span><span>{fmtYen(avg)}</span>
+      </div>
+      {note && <div style={{ marginTop: 10, fontSize: 11, color: C.gray }}>memo: {note}</div>}
+      <div style={{ textAlign: "center", marginTop: 16, fontSize: 11, color: C.gray }}>* * * THANK YOU * * *</div>
+    </div>
+  );
+}
+
 function ReceiptTab({ data, refresh }) {
   const [form, setForm] = useState({ date: todayStr(), salesTotal: "", customerCount: "", note: "" });
 
@@ -558,44 +591,26 @@ function ReceiptTab({ data, refresh }) {
   return (
     <div>
       <Card style={{ marginBottom: 18 }}>
-        <div style={{ fontWeight: 700, marginBottom: 10, color: C.forest }}>レジ締め結果を記録</div>
-        <LeafDivider />
-        <div style={{ display: "flex", flexDirection: "column", gap: 10, maxWidth: 340 }}>
-          <label style={{ fontSize: 13, color: C.gray }}>日付<input type="date" style={{ ...inputStyle, width: "100%", marginTop: 4 }} value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} /></label>
-          <label style={{ fontSize: 13, color: C.gray }}>合計売上金額(円)<input type="number" style={{ ...inputStyle, width: "100%", marginTop: 4 }} value={form.salesTotal} onChange={(e) => setForm({ ...form, salesTotal: e.target.value })} /></label>
-          <label style={{ fontSize: 13, color: C.gray }}>客数(取引件数)<input type="number" style={{ ...inputStyle, width: "100%", marginTop: 4 }} value={form.customerCount} onChange={(e) => setForm({ ...form, customerCount: e.target.value })} /></label>
-          <label style={{ fontSize: 13, color: C.gray }}>メモ(任意)<input style={{ ...inputStyle, width: "100%", marginTop: 4 }} value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} /></label>
-          {form.salesTotal && form.customerCount > 0 && <div style={{ fontSize: 13, color: C.forest, fontWeight: 700 }}>客単価: {fmtYen(parseFloat(form.salesTotal) / parseFloat(form.customerCount))}</div>}
-          <button style={btnPrimary} onClick={add}><Plus size={15} /> 記録する</button>
+        <div style={{ fontWeight: 700, marginBottom: 10, color: C.forest, display: "flex", alignItems: "center", gap: 6 }}>
+          <Receipt size={16} /> レジ締め結果を記録
         </div>
-        <div style={{ marginTop: 12, fontSize: 12, color: C.gray }}>
-          ※ レシートのAI自動読み取りは今後の拡張予定です。今はここに手入力してください。
+        <LeafDivider />
+        <div style={{ display: "flex", gap: 28, flexWrap: "wrap", alignItems: "flex-start" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10, maxWidth: 300, flex: "1 1 260px" }}>
+            <label style={{ fontSize: 13, color: C.gray }}>日付<input type="date" style={{ ...inputStyle, width: "100%", marginTop: 4 }} value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} /></label>
+            <label style={{ fontSize: 13, color: C.gray }}>合計売上金額(円)<input type="number" style={{ ...inputStyle, width: "100%", marginTop: 4 }} value={form.salesTotal} onChange={(e) => setForm({ ...form, salesTotal: e.target.value })} /></label>
+            <label style={{ fontSize: 13, color: C.gray }}>客数(取引件数)<input type="number" style={{ ...inputStyle, width: "100%", marginTop: 4 }} value={form.customerCount} onChange={(e) => setForm({ ...form, customerCount: e.target.value })} /></label>
+            <label style={{ fontSize: 13, color: C.gray }}>メモ(任意)<input style={{ ...inputStyle, width: "100%", marginTop: 4 }} value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} /></label>
+            <button style={btnPrimary} onClick={add}><Plus size={15} /> 記録する</button>
+            <div style={{ fontSize: 12, color: C.gray }}>
+              ※ レシートのAI自動読み取りは今後の拡張予定です。今はここに手入力してください。
+            </div>
+          </div>
+          <div style={{ flex: "0 0 260px" }}>
+            <ReceiptPreview date={form.date} salesTotal={form.salesTotal} customerCount={form.customerCount} note={form.note} />
+          </div>
         </div>
       </Card>
-
-      <Card>
-        <div style={{ fontWeight: 700, marginBottom: 8, color: C.forest }}>記録一覧({data.receiptLogs.length}件)</div>
-        <LeafDivider />
-        {data.receiptLogs.length === 0 ? <div style={{ color: C.gray, fontSize: 13 }}>まだ記録がありません。</div> : (
-          <table style={{ width: "100%", fontSize: 13, borderCollapse: "collapse" }}>
-            <thead><tr style={{ color: C.gray, textAlign: "left" }}><th style={{ padding: 6 }}>日付</th><th style={{ padding: 6 }}>売上高</th><th style={{ padding: 6 }}>客数</th><th style={{ padding: 6 }}>客単価</th><th></th></tr></thead>
-            <tbody>
-              {[...data.receiptLogs].reverse().map((l) => (
-                <tr key={l.id} style={{ borderTop: `1px solid ${C.mossL}` }}>
-                  <td style={{ padding: 6 }}>{l.date}</td>
-                  <td style={{ padding: 6 }}>{fmtYen(l.salesTotal)}</td>
-                  <td style={{ padding: 6 }}>{l.customerCount}人</td>
-                  <td style={{ padding: 6, fontWeight: 600 }}>{fmtYen(l.avgSpend)}</td>
-                  <td style={{ padding: 6, textAlign: "right" }}><button style={btnGhost} onClick={() => remove(l.id)}><Trash size={13} /></button></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </Card>
-    </div>
-  );
-}
 
 // ==================== ダッシュボード ====================
 function DashboardTab({ data }) {
