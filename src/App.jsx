@@ -5,7 +5,7 @@ import {
 } from "recharts";
 import {
   Package, ChefHat, ClipboardList, Trash2, BarChart3, Plus, Trash,
-  Leaf, ChevronRight, AlertCircle, CheckCircle2, Receipt
+  Leaf, ChevronRight, AlertCircle, CheckCircle2, Receipt, Upload, Sparkles
 } from "lucide-react";
 import { supabase } from "./supabaseClient";
 
@@ -581,6 +581,23 @@ function ReceiptPreview({ date, salesTotal, customerCount, note }) {
 
 function ReceiptTab({ data, refresh }) {
   const [form, setForm] = useState({ date: todayStr(), salesTotal: "", customerCount: "", note: "" });
+  const [imagePreview, setImagePreview] = useState(null);
+  const [scanning, setScanning] = useState(false);
+  const fileInputRef = React.useRef(null);
+
+  const onFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImagePreview(URL.createObjectURL(file));
+    setScanning(true);
+    setForm((f) => ({ ...f, salesTotal: "", customerCount: "" }));
+    setTimeout(() => {
+      const sales = Math.round((120000 + Math.random() * 60000) / 1000) * 1000;
+      const count = Math.round(80 + Math.random() * 45);
+      setForm((f) => ({ ...f, salesTotal: String(sales), customerCount: String(count) }));
+      setScanning(false);
+    }, 1600);
+  };
 
   const add = async () => {
     const sales = parseFloat(form.salesTotal);
@@ -588,17 +605,43 @@ function ReceiptTab({ data, refresh }) {
     if (!sales || !count) return;
     await supabase.from("receipt_logs").insert({ log_date: form.date, sales_total: sales, customer_count: count, note: form.note });
     setForm({ date: todayStr(), salesTotal: "", customerCount: "", note: "" });
+    setImagePreview(null);
     refresh();
   };
   const remove = async (id) => { await supabase.from("receipt_logs").delete().eq("id", id); refresh(); };
 
   return (
     <div>
+      <style>{`@keyframes plateau-spin { to { transform: rotate(360deg); } }`}</style>
       <Card style={{ marginBottom: 18 }}>
         <div style={{ fontWeight: 700, marginBottom: 10, color: C.forest, display: "flex", alignItems: "center", gap: 6, fontFamily: FONT_DISPLAY, fontSize: 17, letterSpacing: 0.5 }}>
           <Receipt size={16} /> レジ締め結果を記録
         </div>
         <LeafDivider />
+
+        <input ref={fileInputRef} type="file" accept="image/*" onChange={onFileChange} style={{ display: "none" }} />
+        <div
+          onClick={() => fileInputRef.current?.click()}
+          style={{
+            border: `1.5px dashed ${C.sage}`, borderRadius: 14, padding: "18px 20px", cursor: "pointer",
+            display: "flex", alignItems: "center", gap: 12, marginBottom: 18, background: C.mossL,
+          }}
+        >
+          {imagePreview ? (
+            <img src={imagePreview} alt="レシート画像プレビュー" style={{ height: 48, borderRadius: 6 }} />
+          ) : (
+            <Upload size={20} style={{ color: C.leaf }} />
+          )}
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 500, color: C.forest }}>
+              {scanning ? "レシート画像を読み取り中..." : "レシート画像を選んで自動入力"}
+            </div>
+            <div style={{ fontSize: 11, color: C.gray, marginTop: 2 }}>
+              {scanning ? <><Sparkles size={11} style={{ verticalAlign: -1, marginRight: 3, display: "inline-block", animation: "plateau-spin 1s linear infinite" }} />解析中です、少々お待ちください</> : "タップして画像を選択してください"}
+            </div>
+          </div>
+        </div>
+
         <div style={{ display: "flex", gap: 28, flexWrap: "wrap", alignItems: "flex-start" }}>
           <div style={{ display: "flex", flexDirection: "column", gap: 10, maxWidth: 300, flex: "1 1 260px" }}>
             <label style={{ fontSize: 13, color: C.gray }}>日付<input type="date" style={{ ...inputStyle, width: "100%", marginTop: 4 }} value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} /></label>
@@ -606,8 +649,8 @@ function ReceiptTab({ data, refresh }) {
             <label style={{ fontSize: 13, color: C.gray }}>客数(取引件数)<input type="number" style={{ ...inputStyle, width: "100%", marginTop: 4 }} value={form.customerCount} onChange={(e) => setForm({ ...form, customerCount: e.target.value })} /></label>
             <label style={{ fontSize: 13, color: C.gray }}>メモ(任意)<input style={{ ...inputStyle, width: "100%", marginTop: 4 }} value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} /></label>
             <button style={btnPrimary} onClick={add}><Plus size={15} /> 記録する</button>
-            <div style={{ fontSize: 12, color: C.gray }}>
-              ※ レシートのAI自動読み取りは今後の拡張予定です。今はここに手入力してください。
+            <div style={{ fontSize: 11, color: C.gray }}>
+              ※ 画像読み取りは現在デモ動作です(実際のAI解析ではなく自動入力のイメージ表示)。数値は記録前に確認・修正してください。
             </div>
           </div>
           <div style={{ flex: "0 0 260px" }}>
